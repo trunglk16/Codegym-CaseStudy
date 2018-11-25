@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GAME</title>
+    <style>
+        .score {
+            color: red;
+            margin: 5px;
+            padding: 5px;
+        }
+
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        canvas {
+            background: #eee;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+<center>
+
+    <h1 id="scored" class="score"></h1>
+
+</center>
+<canvas id="myCanvas" width="500" height="450">
+
+</canvas>
+<script>
+    var canvas = document.getElementById("myCanvas");
+    var ctx = canvas.getContext("2d");
+    var dx = 1;
+    var dy = -1;
+    var barWidth = 100;
+    var speed = 20;
+    var score = 0;
+
+
+//////////////////////////////////////////////////////Su kien ban phim  //////////////////////////////////
+    var rightPressed = false;
+    var leftPressed = false;
+    document.addEventListener("keydown", keyDown, false);
+    document.addEventListener("keyup", keyUp, false);
+
+
+    function keyDown(e) {
+        if (e.keyCode == 39) {
+            rightPressed = true;
+        }
+        if (e.keyCode == 37) {
+            leftPressed = true;
+        }
+    }
+
+
+    function keyUp(e) {
+        if (e.keyCode == 39) {
+            rightPressed = false;
+        }
+        else if (e.keyCode == 37) {
+            leftPressed = false;
+        }
+    }
+
+    var Ball = function (x, y, r) {
+        this.x = x;
+        this.y = y;
+        this.r = r;
+        this.drawBall = function () {
+
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2, false);
+            ctx.fillStyle = "black";
+            ctx.fill();
+            ctx.closePath();
+
+            if (this.x + dx > canvas.width - this.r || this.x + dx < this.r) {
+                dx = -1 * dx;
+            }
+
+            if (this.y + dy < this.r) {
+                dy = -1 * dy;
+            }
+            else if (this.y + dy === bar.barY - this.r) {
+                if (this.x > bar.barX && this.x < bar.barX + bar.width) {
+                    dy = -1 * dy;
+                    score++;
+///////////////////////Change Hard////////////////////////////////////////////////////////////////////////
+                    if (speed > 0) {
+                        speed -= 2;
+                    } else {
+                        if (bar.width > 20) {
+                            bar.width -= 5
+                        }
+                    }
+                }
+            }
+//////////////////////////Va vao 1 ben thanh///////////////////////////////////////////////////////////////////////////////////
+
+            // else if(this.y + r/Math.sqrt(2) === bar.barY && this.x + r/Math.sqrt(2)=== bar.barY){
+            //     dx=-dx;
+            //     dy=-dy;
+            // }
+            // else if (this.y + dy > bar.barY - this.r  && this.y + dy <bar.barY + bar.height + this.r) {
+            //
+            //     if (this.x +this.r === bar.barX || this.x - this.r === bar.barX + barWidth) {
+            //           dx = -1 * dx;console.log("ts")
+            //     }
+            // }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            if (this.y + dy >= canvas.height) {
+                clearInterval(game);
+                var c = confirm("GAME OVER" + "\n" + "Bạn đạt " + score + " điểm" + "\n" + "Bạn có muốn chơi lại hay không?");
+                if (c === true) {
+                    document.location.reload();
+                }
+            }
+            this.x += dx;
+            this.y += dy;
+
+        }
+
+
+    };
+    var Bar = function (barX, barY, barWidth, barHeight, color) {
+        this.barX = barX;
+        this.barY = barY;
+        this.width = barWidth;
+        this.height = barHeight;
+        this.color = color;
+
+        this.drawBar = function () {
+
+            ctx.beginPath();
+            ctx.rect(this.barX, this.barY, this.width, this.height);
+            ctx.fillStyle = this.color;
+            ctx.fill();
+            ctx.closePath();
+
+            if (rightPressed && this.barX < canvas.width - this.width) {
+                console.log(this.barX);
+                this.barX += 2;
+            }
+            else if (leftPressed && this.barX > 0) {
+                this.barX -= 2;
+            }
+
+        }
+    };
+    ////////// khai bao //////////
+    var ball = new Ball(canvas.width / 2, canvas.height - 60, 10);
+    var bar = new Bar(200, 400, barWidth, 10, "red");
+
+
+    //////////// draw/////////////////
+    function draw() {
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ball.drawBall();
+        bar.drawBar();
+
+        console.log(bar.barX);
+        document.getElementById("scored").innerHTML = "Bạn đạt " + score + " điểm";
+        if (score >= 10) {
+            canvas.style.background = "blue";
+            bar.color = "yellow";
+        }
+        if (score >= 20) {
+            canvas.background = "red";
+            bar.color = "blue";
+        }
+
+    }
+
+    var game = setInterval(draw, speed);
+
+
+</script>
+</body>
+</html>
